@@ -108,3 +108,40 @@ Create .dockerignore
 ```
 
 # Build the app in a container
+
+Building .NET Core in a container
+```
+docker run --rm -it -v ${PWD}:/api microsoft/dotnet:2-sdk
+```
+
+Inside a contianer shell
+```
+dotnet restore
+dotnet build
+dotnet publish
+```
+
+Move to host shell and goto publish folder
+```
+dotnet api.dll
+```
+-- So you can run an app with only sdk is installed on host machine
+
+Setting port with environment variable
+```
+docker run --rm -it -v ${PWD}:/api -p 8080:80 microsoft/dotnet:2-sdk
+```
+
+Inside a container shell
+```
+cd /api
+export ASPNETCORE_URLS=http://+:80
+dotnet restore
+dotnet run
+```
+-- You can access app from host
+
+Change image
+```
+docker run --rm -it -v ${PWD}:/api -p 8080:80 microsoft/aspnet-core-build:2
+```
