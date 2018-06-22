@@ -145,3 +145,40 @@ Change image
 ```
 docker run --rm -it -v ${PWD}:/api -p 8080:80 microsoft/aspnet-core-build:2
 ```
+
+# Automate building with a docker file
+
+Traditional way
+```
+docker run --rm -it -v ${PWD}:/api -p 8080:80 microsoft/aspnetcore-build:2
+cd /api
+rm -rf bin/ obj/
+dotnet restore
+dotnet publish
+```
+
+With a dockerfile
+```
+FROM microsoft/aspnetcore-build:2
+WORKDIR /api
+COPY . .
+RUN dotnet restore
+RU dotnet publish -o /publish
+WORKDIR /publish
+ENTRYPOINT ["dotnet", "/publish/api.dll"]
+```
+
+Running the dockerfile
+```
+docker build -t aspnetcore/generator:build
+docker run --rm -it -p 8080:80 aspnetcore/generator:build
+```
+
+-- Avoid cache invalidation when cahnging dockerfile
+Inside .dockerignore
+```
+bin/
+obj/
+Dockerfile
+.dockerignore
+```
