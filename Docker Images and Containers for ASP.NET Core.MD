@@ -160,17 +160,19 @@ dotnet publish
 With a dockerfile
 ```
 FROM microsoft/aspnetcore-build:2
+
 WORKDIR /api
 COPY . .
 RUN dotnet restore
-RU dotnet publish -o /publish
+RUN dotnet publish -o /publish
+
 WORKDIR /publish
 ENTRYPOINT ["dotnet", "/publish/api.dll"]
 ```
 
 Running the dockerfile
 ```
-docker build -t aspnetcore/generator:build
+docker build -t aspnetcore/generator:build .
 docker run --rm -it -p 8080:80 aspnetcore/generator:build
 ```
 
@@ -181,4 +183,32 @@ bin/
 obj/
 Dockerfile
 .dockerignore
+```
+
+# Using multi state build to create runtime optimized image
+
+Docker with multi stages
+```
+# Build stage
+FROM microsoft/aspnetcore-build:2 AS build-env
+WORKDIR /api
+
+# Optimize build
+COPY *.csproj .
+RUN dotnet restore
+
+COPY . .
+RUN dotnet publish -c Release -o /publish
+
+# Runtime Stage
+FROM microsoft/aspnetcore:2
+WORKDIR /publish
+COPY --from=build-env /publish .
+ENTRYPOINT ["dotnet", "api.dll"]
+```
+
+Running
+```
+docker build -t aspnetcore/generator:multi .
+docker run --rm -it -p 8080:80 aspnetcore/generator:multi
 ```
