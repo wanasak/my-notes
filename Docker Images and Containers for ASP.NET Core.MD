@@ -212,3 +212,45 @@ Running
 docker build -t aspnetcore/generator:multi .
 docker run --rm -it -p 8080:80 aspnetcore/generator:multi
 ```
+
+# Composing an ASPNET CORE app
+
+Instead run docker build and run we create a docker-compose.yml
+```
+version: '3.1'
+
+services:
+    generator:
+        image: aspnetcore/generator:multi
+        ports:
+            - "8080:80"
+```
+
+Running
+```
+docker-compose up
+```
+
+Starting container in a background
+```
+docker-compose up -d
+```
+
+Cleaning
+```
+docker-compose down
+```
+
+Building 
+```
+version: '3.1'
+
+services:
+    generator:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: aspnetcore/generator:multi
+        ports:
+            - "8080:80"
+```
